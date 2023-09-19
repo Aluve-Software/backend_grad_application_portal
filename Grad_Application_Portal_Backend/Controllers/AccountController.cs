@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 namespace Grad_Application_Portal_Backend.Controllers
@@ -44,10 +45,10 @@ namespace Grad_Application_Portal_Backend.Controllers
                     return new JsonResult(Token);
                 }
                 else
-                    return new JsonResult("Invalid passoword/email");
+                    return new JsonResult("Invalid password/email");
             }
             else
-                return new JsonResult("Invalid passoword/email");
+                return new JsonResult("Invalid password/email");
         }
 
         private string GenerateToken(User user)
@@ -70,7 +71,20 @@ namespace Grad_Application_Portal_Backend.Controllers
 
         private User Authenticate(LoginViewModel login)
         {
+            #region HASH and salt Passoword encryption
 
+            byte[] saltBytes = new byte[16];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(saltBytes);
+            }
+            string salt = Convert.ToBase64String(saltBytes);
+
+            string encryptedPassword = PasswordEncryptor.EncryptPassword(login.Password, salt);
+
+            #endregion
+
+            //Replace login.Password with encryptedPassword
             var results = _context.users.Where(u => u.EmailAddress == login.Email && u.Password == login.Password);
 
             if (results != null)
