@@ -85,7 +85,7 @@ namespace Grad_Application_Portal_Backend.Controllers
             #endregion
 
             //Replace login.Password with encryptedPassword
-            var results = _context.users.Where(u => u.EmailAddress == login.Email && u.Password == login.Password);
+            var results = _context.users.Where(u => u.EmailAddress == login.Email && u.Password == encryptedPassword);
 
             if (results != null)
             {
